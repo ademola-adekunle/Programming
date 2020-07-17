@@ -1,0 +1,36 @@
+#1 INSTALL PACKAGES USED IN THE PROGRAM
+$ sudo apt-get update
+$ sudo python -m pip install -U pip
+$ sudo pip install pip --upgrade
+$ sudo pip install matplotlib          # or sudo pip install matplotlib==2.0.
+$ sudo apt install -y python2-scipy    # or sudo apt-get install python-scipy and sudo apt-get install python-numpy
+$ sudo pip install pandas
+$ sudo pip install xlrd
+$ sudo pip install sklearn
+$ sudo apt-get install idle-python2.7
+
+
+#2 LABJACK EXODRIVER INSTALLATION
+$ sudo apt-get install build-essential
+$ sudo apt-get install libusb-1.0-0-dev
+$ sudo apt-get install git-core
+$ git clone git://github.com/labjack/exodriver.git
+$ cd exodriver/
+$ sudo ./install.sh
+$ cd ..
+$ git clone git://github.com/labjack/LabJackPython.git
+$ cd LabJackPython/
+$ sudo python setup.py install
+
+
+#3 CONFIGURE AUTOSTART
+$ sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
+# write the following at the end of the open autostart file
+@ C:\Users\adekunlea\Documents\OnlineBiosensor\WorkingProgram  #change the file location to point to the program for the biosensorconfig
+
+# COPY ONLINE BIOSENSOR FOLDER TO THE DOCUMENTS FOLDER
+
+#4 ACTIVATE_VNC_SERVER
+'@ From the graphical desktop:'
+'@ Select Menu > Preferences > Raspberry Pi Configuration > Interfaces.'
+'@ Ensure VNC is Enabled'
