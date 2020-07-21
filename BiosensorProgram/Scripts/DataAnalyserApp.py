@@ -17,7 +17,7 @@ class MainWindow(QMainWindow):
         dayplot = Temp_avg = Vmin_avg = np.array([])
 
         #Load the UI Page
-        uic.loadUi(r"C:\Users\adekunlea\Documents\OnlineBiosensor\WorkingProgram\Scripts\Analyzermainwindow.ui", self)
+        uic.loadUi(r"C:\Users\adekunlea\Documents\Programming\BiosensorProgram\Scripts\Analyzermainwindow.ui", self)
 
         self.setWindowTitle("Data Summarizing Application")
 
