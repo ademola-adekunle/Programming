@@ -1,8 +1,9 @@
 ## For first run on this machine, please follow Steps 1 to 3. Preferably run Python IDLE 2.7.x
 # Step 1: Make sure pyserial module is installed.
-# Step 2: Open and run KoradCli.py
-# Step 3: Open and run Koradserial.py
-# Step 4: Open and run setup.py in the main program
+# Step 2: Make sure click is installed
+# Step 3: Open and run KoradCli.py
+# Step 4: Open and run Koradserial.py
+
 
 ## Other details.
 # Port open, close and flush are carried out by the wrapper module.
@@ -32,18 +33,18 @@ from ConfigParser import SafeConfigParser
 # from koradcli import korad
 
 # Definition of serial ports for 2 power supplies
-ps1serialPort = 'COM4' # COMM PORT 1 
+ps1serialPort = 'COM4' # COMM PORT 1
 # ps2serialPort = 'COM6' # COMM PORT 2
 
 # Creating a folder for the INI file (startup)
-if not os.path.exists('C:/Python2716/PS Development/JC_Code/INI'):
-   os.makedirs('C:/Python2716/PS Development/JC_Code/INI')    # Folder and location for INI file
-   os.chdir('C:/Python2716/PS Development/JC_Code/INI')       # change directory to this if needed? INI file can be in another directory
+if not os.path.exists(r'C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI'):
+   os.makedirs(r'C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI')    # Folder and location for INI file
+   os.chdir(r'C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI')       # change directory to this if needed? INI file can be in another directory
 
-if not os.path.exists("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini"):
-   cfgfile = open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
+if not os.path.exists(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI"):
+   cfgfile = open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
    parser = SafeConfigParser()
-   parser.read("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini")
+   parser.read(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini")
    parser.add_section('Settings')
    parser.set('Settings', 'ps1Voltage', '1.4')
    # parser.set('Settings', 'ps2Voltage', '1.4')
@@ -55,13 +56,13 @@ if not os.path.exists("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini"
    # parser.set('Settings', 'runPS2', 'False')
    parser.set('Settings', 'dAqInterval', '20')
    parser.set('Settings', 'dAqON', 'False')
-   with open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'wb') as configfile:
+   with open("C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini",'wb') as configfile:
       parser.write(configfile)
    configfile.close()
 
-cfgfile = open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'r') #INI file creation. I would take this from the final code. This is just for the test
+cfgfile = open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini",'r') #INI file creation. I would take this from the final code. This is just for the test
 parser = SafeConfigParser()
-parser.read("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini")
+parser.read(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini")
 
 # Variable definitions
 # ps1
@@ -143,9 +144,9 @@ cfgfile.close()
 
 if ps1Aval == True:
    # Acquiring initial readings from PS1
-   ps1currentActual  = ps1.current_actual    # actual current being given out
-   ps1currentRead    = ps1.current_set         # read what you previously set
-   ps1deviceStatus   = ps1.status
+   ps1currentActual  = 0.75 #ps1.current_actual    # actual current being given out
+   ps1currentRead    = 0.73 #ps1.current_set         # read what you previously set
+   ps1deviceStatus   = 0.0 #ps1.status
 
    # Assigning the values to PS1
    if runPS1 == 'False':
@@ -185,7 +186,7 @@ class simpleapp_tk(Tkinter.Tk):
       self.master = master
       master.title('MEC Power Supply Monitoring')
       # master.geometry('1000x850+200+200')
-      master.configure(background='lightgray') 
+      master.configure(background='lightgray')
       master.grid() #Layout manager
 
       # ------------------------------------------------------------------------
@@ -196,16 +197,16 @@ class simpleapp_tk(Tkinter.Tk):
       self.filenameLabel = Tkinter.Label(master,textvariable=self.filenameVariable,
                               anchor = "w", fg = "black", bg = 'lightgray', font = "Arial, 12")
       self.filenameVariable.set(u"Datalogging file:")    # default value in display
-      self.filenameLabel.grid(column = 5, row = 6,columnspan = 1,sticky = 'NE') #label position 
+      self.filenameLabel.grid(column = 5, row = 6,columnspan = 1,sticky = 'NE') #label position
 
       self.filenamedisplayVariable = Tkinter.StringVar() # variable to call label
       global vsetfileName
       vsetfileName = self.filenamedisplayVariable
       self.filenamedisplayLabel = Tkinter.Label(master,textvariable=self.filenamedisplayVariable,
                                          anchor = "w", fg = "black", bg = "ivory", font = "Arial, 12")
-      self.filenamedisplayVariable.set(fileName) #default value in display 
+      self.filenamedisplayVariable.set(fileName) #default value in display
       self.filenamedisplayLabel.grid(column = 6, row = 6,columnspan = 1, sticky = 'W')
-      
+
       # ------------------------------------------------------------------------
       # BUTTONS Definitions
       # ------------------------------------------------------------------------
@@ -214,12 +215,12 @@ class simpleapp_tk(Tkinter.Tk):
       self.settingsButton = Tkinter.Button(master, text = "SETTINGS", command = self.Settings,
                               anchor = "center", fg = "black", bg = 'lightgray', font = "Arial, 12") # Button uses the settings function
       self.settingsButton.grid(column = 3, row = 2,columnspan = 1,sticky = 'NESW')
-            
+
       # Graphic definition of START button
       self.startButton = Tkinter.Button(master, text = "START", command = self.Start,
                               anchor = "center", fg = "black", bg = 'lightgray', font = "Arial, 12") # Button uses the Start function
       self.startButton.grid(column = 3, row = 3,columnspan = 1,sticky = 'NESW')
-      
+
       # Graphical definition of STOP button
       self.stopButton = Tkinter.Button(master, text = "STOP", command = self.Stop,
                                        anchor = "center", fg = "black", bg = 'lightgray', font = "Arial, 12") # Button uses the Stop function
@@ -234,11 +235,11 @@ class simpleapp_tk(Tkinter.Tk):
          self.onoffPS1Variable.set(u"PS1: OFF")
       else:
          self.onoffPS1Variable.set(u"PS1: ON")
-      
+
       self.onoffPS1Label = Tkinter.Label(master,textvariable=self.onoffPS1Variable,
                               anchor = "center", fg = "black", bg = 'lightgray', font = "Arial, 12")
-      self.onoffPS1Label.grid(column = 0, row = 0, columnspan = 1, sticky = 'W') 
-      
+      self.onoffPS1Label.grid(column = 0, row = 0, columnspan = 1, sticky = 'W')
+
       # ------------------------------------------------------------------------
       # Displaying PS1 voltage
       # ------------------------------------------------------------------------
@@ -247,15 +248,15 @@ class simpleapp_tk(Tkinter.Tk):
       self.ps1voltageLabel = Tkinter.Label(master,textvariable=self.ps1voltageVariable,
                               anchor = "w", fg = "black", bg = 'lightgray', font = "Arial, 12")
       self.ps1voltageVariable.set(u"PS1 Voltage [V]:")    # default value in display
-      self.ps1voltageLabel.grid(column = 0, row = 2, columnspan = 1, sticky = 'W') 
-      
+      self.ps1voltageLabel.grid(column = 0, row = 2, columnspan = 1, sticky = 'W')
+
       self.ps1VdisplayVariable = Tkinter.StringVar() # variable to call label
       global vsetPS1
       vsetPS1 = self.ps1VdisplayVariable
       self.ps1VdisplayLabel = Tkinter.Label(master,textvariable=self.ps1VdisplayVariable,
                                          anchor = "e", fg = "black", bg = "ivory", font = "Arial, 12")
       self.ps1VdisplayVariable.set(str(ps1Voltage)) #default value in display
-      self.ps1VdisplayLabel.grid(column = 1, row = 2, columnspan = 1, sticky = 'W') 
+      self.ps1VdisplayLabel.grid(column = 1, row = 2, columnspan = 1, sticky = 'W')
 
       # ------------------------------------------------------------------------
       # Displaying PS1 current
@@ -265,15 +266,15 @@ class simpleapp_tk(Tkinter.Tk):
       self.ps1currentLabel = Tkinter.Label(master,textvariable=self.ps1currentVariable,
                               anchor = "w", fg = "black", bg = 'lightgray', font = "Arial, 12")
       self.ps1currentVariable.set(u"PS1 Current [mA]:")    # default value in display
-      self.ps1currentLabel.grid(column = 0, row = 3, columnspan = 1, sticky = 'W') 
+      self.ps1currentLabel.grid(column = 0, row = 3, columnspan = 1, sticky = 'W')
 
       self.ps1IdisplayVariable = Tkinter.StringVar() # variable to call label
       global isetPS1
       isetPS1 = self.ps1IdisplayVariable
       self.ps1IdisplayLabel = Tkinter.Label(master,textvariable=self.ps1IdisplayVariable,
                                          anchor = "e", fg = "black", bg = "ivory", font = "Arial, 12")
-      self.ps1IdisplayVariable.set(str(float(ps1currentActual * 1000))) #default value in display
-      self.ps1IdisplayLabel.grid(column = 1, row = 3, columnspan = 1, sticky = 'W') 
+      #self.ps1IdisplayVariable.set(str(float(ps1currentActual * 1000))) #default value in display
+      self.ps1IdisplayLabel.grid(column = 1, row = 3, columnspan = 1, sticky = 'W')
 
       # ------------------------------------------------------------------------
       # Displaying PS2 status (ON/OFF) on master
@@ -287,7 +288,7 @@ class simpleapp_tk(Tkinter.Tk):
       # else:
       #    self.onoffPS2Variable.set(u"PS2: ON")
       # self.onoffPS2Label.grid(column = 5, row = 0, columnspan = 1, sticky = 'W')
-      
+
       # ------------------------------------------------------------------------
       # Displaying PS2 voltage
       # ------------------------------------------------------------------------
@@ -297,7 +298,7 @@ class simpleapp_tk(Tkinter.Tk):
       #                         anchor = "w", fg = "black", bg = 'lightgray', font = "Arial, 12")
       # self.ps2voltageVariable.set(u"PS2 Voltage [V]:")    # default value in display
       # self.ps2voltageLabel.grid(column = 6, row = 2, columnspan = 1, sticky = 'E')
-      
+
       # self.ps2displayVariable = Tkinter.StringVar() # variable to call label
       # global vsetPS2
       # vsetPS2 = self.ps2displayVariable
@@ -305,7 +306,7 @@ class simpleapp_tk(Tkinter.Tk):
       #                                    anchor = "e", fg = "black", bg = "ivory", font = "Arial, 12")
       # self.ps2displayVariable.set(str(ps2Voltage)) #default value in display
       # self.ps2displayLabel.grid(column = 7, row = 2, columnspan = 1, sticky = 'E')
-      
+
       # ------------------------------------------------------------------------
       # Displaying PS2 current
       # ------------------------------------------------------------------------
@@ -323,7 +324,7 @@ class simpleapp_tk(Tkinter.Tk):
       #                                    anchor = "e", fg = "black", bg = "ivory", font = "Arial, 12")
       # self.ps2IdisplayVariable.set(str(float(ps2currentActual * 1000))) #default value in display
       # self.ps2IdisplayLabel.grid(column = 7, row = 3, columnspan = 1, sticky = 'E')
-      
+
       # ------------------------------------------------------------------------
       # Displaying last data acquisition
       # ------------------------------------------------------------------------
@@ -363,7 +364,7 @@ class simpleapp_tk(Tkinter.Tk):
       # ------------------------------------------------------------------------
       # Displaying Graphic trends for PSx currents
       # ------------------------------------------------------------------------
-      
+
       global f1
       # global f2
       global var1
@@ -385,7 +386,7 @@ class simpleapp_tk(Tkinter.Tk):
       # var1.set_ylim((0,500))
       # var2.set_ylim((0,500))
       var1.plot([],[])
-      # var2.plot([],[])      
+      # var2.plot([],[])
       canvas1 = FigureCanvasTkAgg(f1, master)
       # canvas2 = FigureCanvasTkAgg(f2, master)
       canvas1.show()
@@ -410,8 +411,8 @@ class simpleapp_tk(Tkinter.Tk):
       var1.clear()
       var1.plot(tGraphic,i1Graphic)
       # var2.clear()
-      # var2.plot(tGraphic,i2Graphic)      
-            
+      # var2.plot(tGraphic,i2Graphic)
+
    # COMMANDS Definition
    # Graphical definition of Settings button
    def Settings(self):  # Defines what SETTINGS button does
@@ -421,9 +422,9 @@ class simpleapp_tk(Tkinter.Tk):
       global ps1maxCurrent
       # global ps2Voltage
       # global ps2maxCurrent
-      
+
       self.Settings = Tkinter.Toplevel()
-      self.Settings.configure(background='lightgray') 
+      self.Settings.configure(background='lightgray')
       # self.Settings.geometry('410x235+500+200')
       self.Settings.title("MECs Power Supply Settings")
       self.Settings.grid() # Initializing grid
@@ -452,12 +453,12 @@ class simpleapp_tk(Tkinter.Tk):
       # Graphic definition of SET button
       self.Settings.setFilename = Tkinter.Button(self.Settings, text = "SET", command = self.setFilename,
                               anchor = "center", fg = "black", bg = 'lightgray', font = "Arial, 12") # Button uses the settings function
-      self.Settings.setFilename.grid(column = 2, row = 0, columnspan = 1, sticky = 'W')   
-      
+      self.Settings.setFilename.grid(column = 2, row = 0, columnspan = 1, sticky = 'W')
+
       # ------------------------------------------------------------------------
-      # Configuration of voltage, current and status (ON/OFF) of PS1      
+      # Configuration of voltage, current and status (ON/OFF) of PS1
       # ------------------------------------------------------------------------
-      
+
       try:
          ps1Voltage = ps1.voltage_set       # Initial voltage definition for PS1
       except Exception:
@@ -480,7 +481,7 @@ class simpleapp_tk(Tkinter.Tk):
       self.Settings.ps1VValue = Tkinter.Entry(self.Settings,textvariable=self.Settings.ps1Vv,
                                                   font = ('Arial', 10), width = 5, justify = 'center') # text entry
       self.Settings.ps1Vv.set(str(ps1Voltage))     # Default text prompt
-       
+
       self.Settings.ps1VLabel.grid(column = 0, row = 2, columnspan = 1, sticky = 'W')
       self.Settings.ps1VValue.grid(column = 1, row = 2, columnspan = 1, sticky = 'W')
 
@@ -493,10 +494,10 @@ class simpleapp_tk(Tkinter.Tk):
       self.Settings.ps1VmaxValue = Tkinter.Entry(self.Settings,textvariable=self.Settings.ps1Vmaxv,
                                                   font = ('Arial', 10), width = 5, justify = 'center') # text entry
       self.Settings.ps1Vmaxv.set(str(userdefined_MaxPS1Voltage))     # Default text prompt
-       
+
       self.Settings.ps1VmaxLabel.grid(column = 2, row = 2, columnspan = 1, sticky = 'W')
       self.Settings.ps1VmaxValue.grid(column = 3, row = 2, columnspan = 1, sticky = 'W')
-      
+
       # ------------------------------------------------------------------------
       # PS1 Current
       self.Settings.ps1I = Tkinter.StringVar()  # variable to call label
@@ -510,14 +511,14 @@ class simpleapp_tk(Tkinter.Tk):
 
       self.Settings.ps1ILabel.grid(column = 0, row = 3, columnspan = 1, sticky = 'W')
       self.Settings.ps1IValue.grid(column = 1, row = 3, columnspan = 1, sticky = 'W')
-  
+
       # ------------------------------------------------------------------------
       # Setting the voltage and current to PS1
       # Graphic definition of SET button
       self.Settings.setPS1 = Tkinter.Button(self.Settings, text = "SET", command = self.setPS1,
                               anchor = "center", fg = "black", bg = 'lightgray', font = "Arial, 12") # Button uses the settings function
       self.Settings.setPS1.grid(column = 2, row = 4, columnspan = 1, sticky = 'W')
-      
+
       # ------------------------------------------------------------------------
       # Turning PS1 ON
       # Graphic definition of ON button for PS1
@@ -557,7 +558,7 @@ class simpleapp_tk(Tkinter.Tk):
       # self.Settings.ps2VValue = Tkinter.Entry(self.Settings,textvariable=self.Settings.ps2Vv,
       #                                             font = ('Arial', 10), width = 5, justify = 'center') # text entry
       # self.Settings.ps2Vv.set(str(ps2Voltage))     # Default text prompt
-      #  
+      #
       # self.Settings.ps2VLabel.grid(column = 0, row = 5, columnspan = 1, sticky = 'W')
       # self.Settings.ps2VValue.grid(column = 1, row = 5, columnspan = 1, sticky = 'W')
 
@@ -570,7 +571,7 @@ class simpleapp_tk(Tkinter.Tk):
       # self.Settings.ps2VmaxValue = Tkinter.Entry(self.Settings,textvariable=self.Settings.ps2Vmaxv,
       #                                             font = ('Arial', 10), width = 5, justify = 'center') # text entry
       # self.Settings.ps2Vmaxv.set(str(userdefined_MaxPS2Voltage))     # Default text prompt
-      #  
+      #
       # self.Settings.ps2VmaxLabel.grid(column = 2, row = 5, columnspan = 1, sticky = 'W')
       # self.Settings.ps2VmaxValue.grid(column = 3, row = 5, columnspan = 1, sticky = 'W')
 
@@ -584,7 +585,7 @@ class simpleapp_tk(Tkinter.Tk):
       # self.Settings.ps2IValue = Tkinter.Entry(self.Settings,textvariable=self.Settings.ps2Iv,
       #                                             font = ('Arial', 10), width = 5, justify = 'center') # text entry
       # self.Settings.ps2Iv.set(str(ps2maxCurrent))     # Default text prompt
-    
+
       # self.Settings.ps2ILabel.grid(column = 0, row = 6, columnspan = 1, sticky = 'W')
       # self.Settings.ps2IValue.grid(column = 1, row = 6, columnspan = 1, sticky = 'W')
 
@@ -594,7 +595,7 @@ class simpleapp_tk(Tkinter.Tk):
       # self.Settings.setPS2 = Tkinter.Button(self.Settings, text = "SET", command = self.setPS2,
       #                         anchor = "center", fg = "black", bg = 'lightgray', font = "Arial, 12") # Button uses the settings function
       # self.Settings.setPS2.grid(column = 2, row = 7, columnspan = 1, sticky = 'W')
-    
+
       # ------------------------------------------------------------------------
       # Turning PS2 ON
       # Graphic definition of ON button for PS1
@@ -622,14 +623,14 @@ class simpleapp_tk(Tkinter.Tk):
                                                   font = ('Arial', 10), width = 5, justify = 'center')    # text entry
       self.Settings.daqinterval.set(str(daqInterval))     # default text prompt
       self.Settings.daqintervalEntry.grid(column = 1, row = 1, columnspan = 1, sticky = 'W')
-      
+
       # ------------------------------------------------------------------------
       # Setting the data acquisition interval
       # Graphic definition of SET button
       self.Settings.setdAcqInterval = Tkinter.Button(self.Settings, text = "SET", command = self.setdAcqInterval,
                               anchor = "center", fg = "black", bg = 'lightgray', font = "Arial, 12") # Button uses the settings function
       self.Settings.setdAcqInterval.grid(column = 2, row = 1, columnspan = 1, sticky = 'W')
-   
+
       def on_closing():
          global ps1Vini
          global ps1Vmaxini
@@ -644,7 +645,7 @@ class simpleapp_tk(Tkinter.Tk):
          cfgfile = open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
          parser = SafeConfigParser()
 
-         parser.read("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini")
+         parser.read(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini")
          parser.add_section('Settings')
          parser.set('Settings', 'ps1Voltage', ps1Vini)
          # parser.set('Settings', 'ps2Voltage', ps2Vini)
@@ -656,13 +657,13 @@ class simpleapp_tk(Tkinter.Tk):
          # parser.set('Settings', 'runPS2', runPS2)
          parser.set('Settings', 'dAqInterval', str(daqInterval))
          parser.set('Settings', 'dAqON', dAqON)
-         with open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'wb') as configfile:
+         with open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini",'wb') as configfile:
             parser.write(configfile)
          configfile.close()
          self.Settings.destroy()
 
       self.Settings.protocol("WM_DELETE_WINDOW", on_closing)
-      
+
    # ------------------------------------------------------------------------
    def setFilename(self):
       time.sleep(1)
@@ -684,14 +685,14 @@ class simpleapp_tk(Tkinter.Tk):
       # PS1 Voltage
       self.Settings.ps1Vv.set(self.Settings.ps1Vv.get())
       ps1Voltage = float(self.Settings.ps1Vv.get())
-      userdefined_MaxPS1Voltage = float(self.Settings.ps1Vmaxv.get())   
+      userdefined_MaxPS1Voltage = float(self.Settings.ps1Vmaxv.get())
 
       if userdefined_MaxPS1Voltage > maxPSV:
          tkMessageBox.showinfo( "Alert", " Specified Max SP for PS1 voltage is greater than PS tolerance ", )
          userdefined_MaxPS1Voltage = max(0,min(userdefined_MaxPS1Voltage,maxPSV))
       self.Settings.ps1Vmaxv.set(userdefined_MaxPS1Voltage)
       ps1Vmaxini = str(self.Settings.ps1Vmaxv.get())
- 
+
       if ps1Voltage > userdefined_MaxPS1Voltage:
          time.sleep(0.1)
          tkMessageBox.showinfo( "Alert", " Specified voltage SP for PS1 is greater than the defined maximum ", )
@@ -699,19 +700,19 @@ class simpleapp_tk(Tkinter.Tk):
             ps1Voltage = ps1.voltage_set
          except Exception:
            pass
-         
+
       ps1.voltage = max(0,min(ps1Voltage,userdefined_MaxPS1Voltage)) # set voltage
       time.sleep(0.5)
       try:
          ps1Voltage = ps1.voltage_set         # read what you previously set
       except Exception:
          pass
-         
-      self.Settings.ps1Vv.set(ps1Voltage)      
+
+      self.Settings.ps1Vv.set(ps1Voltage)
       time.sleep(0.1)
       ps1Vini = str(self.Settings.ps1Vv.get())
       vsetPS1.set(str(ps1Voltage))
-      
+
       # PS1 Current
       self.Settings.ps1Iv.set(self.Settings.ps1Iv.get())
       ps1Current = float(self.Settings.ps1Iv.get())
@@ -726,8 +727,8 @@ class simpleapp_tk(Tkinter.Tk):
       self.Settings.ps1Iv.set(ps1currentRead)
       ps1Imaxini = str(self.Settings.ps1Iv.get())
 
-   def onPS1(self):   
-      global runPS1    
+   def onPS1(self):
+      global runPS1
       try:
          ps1.ovp = 'off'
          ps1.ocp = 'on'
@@ -738,7 +739,7 @@ class simpleapp_tk(Tkinter.Tk):
          runPS1 = 'True'
       except Exception:
          pass
-      
+
    def offPS1(self):
       global runPS1
       try:
@@ -751,25 +752,25 @@ class simpleapp_tk(Tkinter.Tk):
          runPS1 = 'False'
       except Exception:
          pass
-         
+
    # ------------------------------------------------------------------------
    # def setPS2(self):
       # global ps2Vini
       # global ps2Vmaxini
       # global ps2Imaxini
-      
+
       # time.sleep(1)
-      # # PS2 Voltage 
+      # # PS2 Voltage
       # self.Settings.ps2Vv.set(self.Settings.ps2Vv.get())
       # ps2Voltage = float(self.Settings.ps2Vv.get())
-      # userdefined_MaxPS2Voltage = float(self.Settings.ps2Vmaxv.get())   
+      # userdefined_MaxPS2Voltage = float(self.Settings.ps2Vmaxv.get())
 
       # if userdefined_MaxPS2Voltage > maxPSV:
          # tkMessageBox.showinfo( "Alert", " Specified Max SP for PS2 voltage is greater than PS tolerance ", )
          # userdefined_MaxPS2Voltage = max(0,min(userdefined_MaxPS2Voltage,maxPSV))
       # self.Settings.ps2Vmaxv.set(userdefined_MaxPS2Voltage)
       # ps2Vmaxini = str(self.Settings.ps2Vmaxv.get())
-      
+
       # if ps2Voltage > userdefined_MaxPS2Voltage:
          # tkMessageBox.showinfo( "Alert", " Specified voltage SP for PS2 is greater than the defined maximum ", )
          # time.sleep(0.1)
@@ -781,7 +782,7 @@ class simpleapp_tk(Tkinter.Tk):
       # time.sleep(0.1)
       # ps2Vini = str(self.Settings.ps2Vv.get())
       # vsetPS2.set(str(ps2voltageRead))
-      
+
       # # PS2 Current
       # self.Settings.ps2Iv.set(self.Settings.ps2Iv.get())
       # ps2Current = float(self.Settings.ps2Iv.get())
@@ -814,14 +815,14 @@ class simpleapp_tk(Tkinter.Tk):
       # try:
          # ps2.ovp = 'off'
          # ps2.ocp = 'on'
-         # ps2.cv = 'on'      
+         # ps2.cv = 'on'
          # ps2.output = 'off'
          # time.sleep(1)
          # self.onoffPS2Variable.set(u"PS2: OFF")    # default value in display
          # runPS2 = 'False'
       # except Exception:
          # pass
-         
+
    # ------------------------------------------------------------------------
    def setdAcqInterval(self):
       time.sleep(1)
@@ -829,7 +830,7 @@ class simpleapp_tk(Tkinter.Tk):
       self.Settings.daqinterval.set(self.Settings.daqinterval.get())
       daqInterval = float(self.Settings.daqinterval.get())
       self.Settings.daqinterval.set(daqInterval)
-      
+
    # ------------------------------------------------------------------------
    def Stop(self):  #defines what a button does
       time.sleep(1)
@@ -838,9 +839,9 @@ class simpleapp_tk(Tkinter.Tk):
       dAcqFlag = False
       dAqON = 'False'
       self.write_ini()
-         
+
    # ------------------------------------------------------------------------
-      
+
    def Start(self):  #defines START button does
       time.sleep(1)
       global dAcqFlag
@@ -850,7 +851,7 @@ class simpleapp_tk(Tkinter.Tk):
       global dAqON
       dAcqFlag = True
       dAqON = 'True'
-      
+
       ps1.ovp = 'off'
       ps1.ocp = 'on'
       ps1.cv = 'on'
@@ -874,9 +875,9 @@ class simpleapp_tk(Tkinter.Tk):
       global daqInterval
       global runPS1
       # global runPS2
-      cfgfile = open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
+      cfgfile = open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
       parser = SafeConfigParser()
-      parser.read("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini")
+      parser.read(r"C:\Users\adekunlea\Documents\Programming\PowerSup\plyProgram\Version 1\INI\ps1Settings.ini")
       parser.add_section('Settings')
       parser.set('Settings', 'ps1Voltage', ps1Vini)
       # parser.set('Settings', 'ps2Voltage', ps2Vini)
@@ -888,10 +889,10 @@ class simpleapp_tk(Tkinter.Tk):
       # parser.set('Settings', 'runPS2', runPS2)
       parser.set('Settings', 'dAqInterval', str(daqInterval))
       parser.set('Settings', 'dAqON', dAqON)
-      with open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'wb') as configfile:
+      with open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini",'wb') as configfile:
          parser.write(configfile)
       configfile.close()
-      
+
 
 def on_closing_Main():
    global ps1Vini
@@ -903,9 +904,9 @@ def on_closing_Main():
    global daqInterval
    global runPS1
    # global runPS2
-   cfgfile = open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
+   cfgfile = open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
    parser = SafeConfigParser()
-   parser.read("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini")
+   parser.read(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini")
    parser.add_section('Settings')
    parser.set('Settings', 'ps1Voltage', ps1Vini)
    # parser.set('Settings', 'ps2Voltage', ps2Vini)
@@ -917,11 +918,11 @@ def on_closing_Main():
    # parser.set('Settings', 'runPS2', runPS2)
    parser.set('Settings', 'dAqInterval', str(daqInterval))
    parser.set('Settings', 'dAqON', dAqON)
-   with open("C:/Python2716/PS Development/JC_Code/INI/ps1Settings.ini",'wb') as configfile:
+   with open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\INI\ps1Settings.ini",'wb') as configfile:
       parser.write(configfile)
    configfile.close()
    root.destroy()
-      
+
 # ------------------------------------------------------------------------
 root = Tk()
 my_gui = simpleapp_tk(root)
@@ -933,9 +934,9 @@ i1Graphic = []
 a = 0
 tupdate = int(float(daqInterval) * 60 * 1000) # ms
 
-if not os.path.exists('/Python2716/PS Development/JC_Code/ps1Datalogging'):
-   os.makedirs('/Python2716/PS Development/JC_Code/ps1Datalogging') #create folder for documents if it doesnt exist
-   os.chdir('/Python2716/PS Development/JC_Code/ps1Datalogging') #change directory to this new folder and save files here
+if not os.path.exists(r'C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\ps1Datalogging'):
+   os.makedirs(r'C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\ps1Datalogging') #create folder for documents if it doesnt exist
+   os.chdir(r'C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\ps1Datalogging') #change directory to this new folder and save files here
 
 def maincode():
    global dAcqFlag
@@ -965,11 +966,11 @@ def maincode():
    firstTime = True
 
    while True:
-      os.chdir('/Python2716/PS Development/JC_Code/ps1Datalogging') #change directory to this new folder and save files here
+      os.chdir(r'C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 1\ps1Datalogging') #change directory to this new folder and save files here
       tupdate = int(float(daqInterval) * 60 * 1000) # ms
       now = time.time()
       if dAqON == 'True':
-         dAcqFlag = True      
+         dAcqFlag = True
       try:
          isetPS1.set(str(float(ps1.current_actual * 1000)))
       except Exception:
@@ -977,12 +978,12 @@ def maincode():
       # try:
          # isetPS2.set(str(float(ps2.current_actual * 1000)))
       # except Exception:
-         # pass        
+         # pass
       if dAcqFlag:
          dAcqTimer = round(max(0,((previous_now + daqInterval * 60) - now)/60),2)
          timer.set(str(dAcqTimer))
       if not dAcqFlag:
-         dAcqTimer = 0         
+         dAcqTimer = 0
       # 2 different communication attempts are necessary, so if 1 power supply does not work,
       # we can keep on working with the second
       try:
@@ -999,7 +1000,7 @@ def maincode():
          # time.sleep(1)
       # except Exception:
          # pass
-    
+
       if firstTime and dAcqFlag:
          saveFile = open(fileName,"a") #for calling the filename where data has been saved
          # headers = ['Date', 'Vps1', 'Ips1', 'Vps2','Ips2']
@@ -1039,9 +1040,9 @@ def maincode():
          canvas1.get_tk_widget().grid(column = 0, row = 1, columnspan = 3, padx = 10, pady = 10, sticky = 'W') #graph position
          # canvas2.get_tk_widget().grid(column = 5, row = 1, columnspan = 3, padx = 10, pady = 10, sticky = 'W') #graph position
 
- 
+
       if (now - previous_now) >= (daqInterval * 60) and dAcqFlag:
-         previous_now = now         
+         previous_now = now
          saveFile = open(fileName,"a") #for calling the filename where data has been saved
          # data = [str(date),str(ps1V),str(ps1C),str(ps2V),str(ps2C)]
          data = [str(date),str(ps1V),str(ps1C)]
@@ -1087,7 +1088,7 @@ def maincode():
 root.update_idletasks()
 thread = threading.Thread(target = maincode)
 #make measuring thread terminate when the user exits the window
-thread.daemon = True 
+thread.daemon = True
 thread.start()
 
 root.protocol("WM_DELETE_WINDOW", on_closing_Main)
