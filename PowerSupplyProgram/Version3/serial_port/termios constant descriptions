@@ -1,0 +1,137 @@
+Baud rate contstants for ispeed and ospeed
+
+B0      0
+B50     1
+B75     2
+B110    3
+B134    4
+B150    5
+B200    6
+B300    7
+B600    8
+B1200   9
+B1800   10
+B2400   11
+B4800   12
+B9600   13
+B19200  14
+B38400  15
+
+Following speeds use extended speed bit CBAUDEX
+
+B57600    4096 + 1
+B115200   4096 + 2
+B230400   4096 + 3
+B460800   4096 + 4
+CBAUDEX   4096
+CBAUD     4096 + 15 Baud rate mask
+
+Input control flags (iflag)
+
+IGNBRK    Ignore BREAK condition on input.
+BRKINT    If IGNBRK is set, a BREAK is ignored. If it is not set but BRKINT is set, then a BREAK causes the input and output queues to be flushed, and if the terminal is the controlling terminal of a foreground process group, it will cause a SIGINT to be sent to this foreground process group. When neither IGNBRK nor BRKINT are set, a BREAK reads as a null byte ('\0'), except when PARMRK is set, in which case it reads as the sequence \377 \0 \0.
+IGNPAR    Ignore framing errors and parity errors.
+PARMRK    If IGNPAR is not set, prefix a character with a parity error or framing error with \377 \0. If neither IGNPAR nor PARMRK is set, read a character with a parity error or framing error as \0.
+INPCK     Enable input parity checking.
+ISTRIP    Strip off eighth bit.
+INLCR     Translate NL to CR on input.
+IGNCR     Ignore carriage return on input.
+ICRNL     Translate carriage return to newline on input (unless IGNCR is set).
+IUCLC     (not in POSIX) Map uppercase characters to lowercase on input.
+IXON      Enable XON/XOFF flow control on output.
+IXANY     (XSI) Typing any character will restart stopped output.
+IXOFF     Enable XON/XOFF flow control on input.
+IMAXBEL   (not in POSIX) Ring bell when input queue is full.
+
+Output control flags (oflag)
+
+OPOST     Enable implementation-defined output processing.
+OLCUC     (not in POSIX) Map lowercase characters to uppercase on output.
+ONLCR     (XSI) Map NL to CR-NL on output.
+OCRNL     Map CR to NL on output.
+ONOCR     Don't output CR at column 0.
+ONLRET    Don't output CR.
+OFILL     Send fill characters for a delay, rather than using a timed delay.
+OFDEL     (not in POSIX) Fill character is ASCII DEL (0177).
+NLDLY     Newline delay mask. Values are NL0 and NL1.
+CRDLY     Carriage return delay mask. Values are CR0, CR1, CR2, or CR3.
+TABDLY    Horizontal tab delay mask. Values are TAB0, TAB1, TAB2, TAB3 (or XTABS).
+BSDLY     Backspace delay mask. Values are BS0 or BS1.
+VTDLY     Vertical tab delay mask. Values are VT0 or VT1.
+FFDLY     Form feed delay mask. Values are FF0 or FF1.
+
+
+Control flags (cflag)
+
+CBAUD     (not in POSIX) Baud speed mask (4+1 bits).
+CBAUDEX   (not in POSIX) Extra baud speed mask (1 bit), included in CBAUD.
+CSIZE     Character size mask. Values are CS5, CS6, CS7, or CS8.
+CSTOPB    Set two stop bits, rather than one.
+CREAD     Enable receiver.
+PARENB    Enable parity generation on output and parity checking for input.
+PARODD    If set, then parity for input and output is odd; otherwise even parity is used.
+HUPCL     Lower modem control lines after last process closes the device (hang up).
+CLOCAL    Ignore modem control lines.
+CIBAUD    (not in POSIX) Mask for input speeds.
+CRTSCTS   (not in POSIX) Enable RTS/CTS (hardware) flow control.
+
+CSIZE values
+
+CS5       5 Bit character length
+CS6       6 Bit character length
+CS7       7 Bit character length
+CS8       8 Bit character length
+
+Line control flags (lflag)
+
+ISIG      When any of the characters INTR, QUIT, SUSP, or DSUSP are received, generate the corresponding signal.
+ICANON    Enable canonical mode.
+XCASE     (not in POSIX; not supported under Linux)
+ECHO      Echo input characters.
+ECHOE     If ICANON is also set, the ERASE character erases the preceding input character, and WERASE erases the preceding word.
+ECHOK     If ICANON is also set, the KILL character erases the current line.
+ECHONL    If ICANON is also set, echo the NL character even if ECHO is not set.
+NOFLSH    Disable flushing the input and output queues when generating signals for the INT, QUIT, and SUSP characters.
+TOSTOP    Send the SIGTTOU signal to the process group of a background process which tries to write to its controlling terminal.
+ECHOCTL   (not in POSIX)
+ECHOPRT   (not in POSIX)
+ECHOKE    (not in POSIX)
+FLUSHO    (not in POSIX; not supported under Linux)
+PENDIN    (not in POSIX; not supported under Linux)
+IEXTEN    Enable implementation-defined input processing.
+
+Pointers into cc list
+
+NCCS      Total size of cc list
+
+VINTR     
+VQUIT     
+VERASE    
+VKILL     
+VEOF      
+VTIME     Timeout in deciseconds for noncanonical read (TIME).
+VMIN      Minimum number of characters for noncanonical read (MIN).
+VSWTC     
+VSWTCH    
+VSTART    
+VSTOP     
+VSUSP     
+VEOL      
+VREPRINT  
+VDISCARD  
+VWERASE   
+VLNEXT    
+VEOL2
+
+Modem control lines
+
+TIOCMGET    Command to get status of modem control bits
+TIOCMSET    Command to set status of modem control bits
+TIOCMBIC    Command to clear modem control line bits
+TIOCMBIS    Command to set modem control line bits
+
+TIOCM_CTS   CTS modem control line bit
+TIOCM_RTS   RTS modem control line bit
+TIOCM_DSR   DSR modem control line bit
+TIOCM_RI    RI modem control line bit
+TIOCM_CAR   DCD modem control line bit
