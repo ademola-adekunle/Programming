@@ -12,7 +12,7 @@
 
 # All icons used are from https://p.yusukekamiyamane.com/
 
-import sys
+import sys, glob, serial
 from PyQt5 import uic, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QLabel
 from PyQt5.QtWidgets import *
@@ -23,7 +23,6 @@ import pyqtgraph as pg
 import time
 from unittest import TestCase, main
 import datetime
-import sys
 import threading
 from koradserial import KoradSerial, OnOffState, OutputMode
 import os
@@ -38,10 +37,40 @@ fileName = 'DataLoggingTest.txt'
 #------------------------------------------------------------------------------#
 # FUNCTIONS
 #------------------------------------------------------------------------------#
+def serial_ports(self):
+    """ Lists serial port names
+
+        :raises EnvironmentError:
+            On unsupported or unknown platforms
+        :returns:
+            A list of the serial ports available on the system
+    """
+    if sys.platform.startswith('win'):
+        ports = ['COM%s' % (i + 1) for i in range(256)]
+    elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
+        # this excludes your current terminal "/dev/tty"
+        ports = glob.glob('/dev/tty[A-Za-z]*')
+    elif sys.platform.startswith('darwin'):
+        ports = glob.glob('/dev/tty.*')
+    else:
+        raise EnvironmentError('Unsupported platform')
+        self.statusbar.showMessage("EnvironmentError: Unsupported platform")
+
+    result = []
+    for port in ports:
+        try:
+            s = serial.Serial(port)
+            s.close()
+            result.append(port)
+        except (OSError, serial.SerialException):
+            self.statusbar.showMessage("Error: Serial exception")
+            pass
+    return result
+
 def INI_write(psVoltage, psCurrent, psVoltageMax, runPS1, dAqInterval, dAqON): # function to write an INI file
-    cfgfile = open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI\psSettings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
+    cfgfile = open(r"INI\psSettings.ini",'w') #INI file creation. I would take this from the final code. This is just for the test
     parser = ConfigParser()
-    parser.read(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI\psSettings.ini")
+    parser.read(r"INI\psSettings.ini")
     parser.add_section('Settings')
     parser.set('Settings', 'ps1Voltage', str(psVoltage))
     parser.set('Settings', 'ps1Current', str(psCurrent))
@@ -49,15 +78,15 @@ def INI_write(psVoltage, psCurrent, psVoltageMax, runPS1, dAqInterval, dAqON): #
     parser.set('Settings', 'runPS1', str(runPS1))
     parser.set('Settings', 'dAqInterval', str(dAqInterval))
     parser.set('Settings', 'dAqON', str(dAqON))
-    with open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI\psSettings.ini",'w') as configfile:
+    with open(r"INI\psSettings.ini",'w') as configfile:
         parser.write(configfile)
     configfile.close()
 
 def INI_read(): # function to read an INI file
     global ps1Voltage, ps1CurrentMax, ps1VoltageMax, runPS1, dAqInterval, dAqON
-    cfgfile = open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI\psSettings.ini",'r') #INI file creation. I would take this from the final code. This is just for the test
+    cfgfile = open(r"INI\psSettings.ini",'r') #INI file creation. I would take this from the final code. This is just for the test
     parser = ConfigParser()
-    parser.read(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI\psSettings.ini")
+    parser.read(r"INI\psSettings.ini")
 
     # Acquiring the values from the INI file
     ps1Voltage = float(parser.get("Settings", 'ps1Voltage'))
@@ -94,11 +123,11 @@ def PS_read():
 # START-UP ACTIONS
 #------------------------------------------------------------------------------#
 # Creating a folder for the INI file (startup)
-if not os.path.exists(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI"):
-   os.makedirs(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI")    # Folder and location for INI file
+if not os.path.exists(r"INI"):
+   os.makedirs(r"INI")    # Folder and location for INI file
    #os.chdir(r"C:\Users\matth\Documents\NRC\RPi\Telemetry_1PS\INI")      # change directory to this if needed? INI file can be in another directory
 
-if not os.path.exists(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI\psSettings.ini"):
+if not os.path.exists(r"INI\psSettings.ini"):
     dAqInterval = 20.0
     runPS1 = False
     dAqON = False
@@ -107,9 +136,9 @@ if not os.path.exists(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProg
 else:
     INI_read()
 
-cfgfile = open(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI\psSettings.ini",'r') #INI file creation. I would take this from the final code. This is just for the test
+cfgfile = open(r"INI\psSettings.ini",'r') #INI file creation. I would take this from the final code. This is just for the test
 parser = ConfigParser()
-parser.read(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\INI\psSettings.ini")
+parser.read(r"INI\psSettings.ini")
 
 ps1Aval = PS_check()
 
@@ -118,9 +147,61 @@ if ps1Aval == True:
     PS_write()
 
     if runPS1 == 'False':
-       ps1.output = 'off'
+        ps1.output = 'off'
     else:
-       ps1.output = 'on'
+        ps1.output = 'on'
+#------------------------------------------------------------------------------#
+# DIALONG BOXES
+#------------------------------------------------------------------------------#
+class AdvSettings(QDialog):
+    global ps1
+
+    def __init__(self, *args, **kwargs):
+        super(AdvSettings, self).__init__(*args, **kwargs)
+        os.chdir(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2")
+        uic.loadUi(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\AdvSettings_v1-1.ui", self)
+
+        self.setWindowTitle(u"Advanced PS Settings")
+
+        self.cvCheckBox.stateChanged.connect(self.cv_state_change)
+        self.ccCheckBox.stateChanged.connect(self.cc_state_change)
+        self.ovpCheckBox.stateChanged.connect(self.ovp_state_changed)
+        self.ocpCheckBox.stateChanged.connect(self.ocp_state_changed)
+
+        self.advsetButtonBox.accepted.connect(self.accept)
+        self.advsetButtonBox.rejected.connect(self.reject)
+
+    def cv_state_change(self):
+        if self.cvCheckBox.isChecked() == True:
+            self.ccCheckBox.setCheckState(False)
+            self.ccCheckBox.setEnabled(False)
+
+        else:
+            self.ccCheckBox.setEnabled(True)
+
+    def cc_state_change(self):
+        if self.ccCheckBox.isChecked() == True:
+            self.cvCheckBox.setCheckState(False)
+            self.cvCheckBox.setEnabled(False)
+
+        else:
+            self.cvCheckBox.setEnabled(True)
+
+    def ovp_state_changed(self):
+        if self.ovpCheckBox.isChecked() == True:
+            self.ocpCheckBox.setCheckState(False)
+            self.ocpCheckBox.setEnabled(False)
+
+        else:
+            self.ocpCheckBox.setEnabled(True)
+
+    def ocp_state_changed(self):
+        if self.ocpCheckBox.isChecked() == True:
+            self.ovpCheckBox.setCheckState(False)
+            self.ovpCheckBox.setEnabled(False)
+
+        else:
+            self.ovpCheckBox.setEnabled(True)
 #------------------------------------------------------------------------------#
 # MAIN WINDOW
 #------------------------------------------------------------------------------#
@@ -128,10 +209,10 @@ class MainWindow(QMainWindow):
     global ps1, ps1Voltage, ps1CurrentMax, ps1VoltageMax
 
     def __init__(self, *args, **kwargs):
-        global is_editing_setvals
+        global is_editing_setvals, koradports
         super(MainWindow, self).__init__(*args, **kwargs)
         os.chdir(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2")
-        uic.loadUi(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\RPi_GUI_v1-2.ui", self)
+        uic.loadUi(r"C:\Users\adekunlea\Documents\Programming\PowerSupplyProgram\Version 2\RPi_GUI_v1-3.ui", self)
 
         self.setWindowIcon(QIcon(r"Icon_Store\icons\lightning.png"))
         self.setWindowTitle(u"MEC Telemetry Application")
@@ -154,15 +235,21 @@ class MainWindow(QMainWindow):
         is_editing_setvals = False
         self.settingsEditButton.clicked.connect(self.on_setEdit_button_clicked)
         self.settingsOKButton.clicked.connect(self.on_setOK_button_clicked)
+        self.advsetButton.clicked.connect(self.on_advset_button_clicked)
 
         self.datalogButton.clicked.connect(self.on_datalog_button_clicked)
         self.plotsetButton.clicked.connect(self.timer_start) # should be on_plotset_button_clicked, timer for testing
 
         self.startButton.clicked.connect(self.on_start_button_clicked)
 
-        self.comBox.addItems(["COM1", "COM2", "COM3", "COM4"])
+        self.findPSButton.clicked.connect(self.on_findPS_button_clicked)
 
-        # initialising the x and y plotting variables
+        koradports = []
+        self.comBox.addItems(koradports)
+
+        self.statusbar.setStyleSheet('background-color: lightgray')
+
+        # initialising the x and y plotting variables (1 = left axis, 2 = right axis)
         self.x = []
         self.y1 = []
         self.y2 = []
@@ -170,7 +257,7 @@ class MainWindow(QMainWindow):
         color = self.palette().color(QtGui.QPalette.Window)  # Get the default window background,
         self.graphWidget.setBackground(color)
         # Add Title
-        self.graphWidget.setTitle(u"KORAD Power Supply", color="k", size="12pt")
+        self.graphWidget.setTitle(u"MEC Telemetry", color="k", size="12pt")
         # Add Axis Labels
         styles = {"color": "k", "font-size": "10pt"}
         # Making plot's axis lines black
@@ -197,19 +284,46 @@ class MainWindow(QMainWindow):
     def check_onlineDisplay(self):
         if self.onlineDisplay.text() == 'OFFLINE':
             self.onlineDisplay.setStyleSheet("background-color: red")
+
         else:
             self.onlineDisplay.setStyleSheet("background-color: green")
+
+    def on_findPS_button_clicked(self):
+        global koradports
+        ports = serial_ports(self)
+
+        if ports:
+            self.statusbar.clearMessage()
+            for i in ports:
+                try:
+                    koradports = KoradSerial(str(ports[i-1]))
+                    self.comBox.addItem(str(koradports[i-1])) # use this to save them to INI too?
+
+                except Exception:
+                    pass
+
+            if not koradports: # if no koradports are found
+                self.statusbar.showMessage("No korad serial ports detected!")
+
+        else:
+            self.statusbar.showMessage("No serial ports detected!")
 
     def on_setEdit_button_clicked(self):
         global is_editing_setvals
         is_editing_setvals = True
 
+        displayfont = self.setvoltageDisplay.font()
+        displayfont.setPointSize(10)
+
         self.setvoltageDisplay.setReadOnly(False)
         self.setvoltageDisplay.setStyleSheet("background-color: white")
+        self.setvoltageDisplay.setFont(displayfont)
         self.maxvoltageDisplay.setReadOnly(False)
         self.maxvoltageDisplay.setStyleSheet("background-color: white")
+        self.maxvoltageDisplay.setFont(displayfont)
         self.maxcurrentDisplay.setReadOnly(False)
         self.maxcurrentDisplay.setStyleSheet("background-color: white")
+        self.maxcurrentDisplay.setFont(displayfont)
 
     def on_setOK_button_clicked(self):
         global is_editing_setvals, runPS1, dAqFlag
@@ -221,19 +335,34 @@ class MainWindow(QMainWindow):
         else:
             is_editing_setvals = False
 
+            displayfont = self.setvoltageDisplay.font()
+            displayfont.setPointSize(10)
+
             self.statusbar.clearMessage()
             self.setvoltageDisplay.setReadOnly(True)
             self.setvoltageDisplay.setStyleSheet("background-color: lightgray")
+            self.setvoltageDisplay.setFont(displayfont)
             self.maxvoltageDisplay.setReadOnly(True)
             self.maxvoltageDisplay.setStyleSheet("background-color: lightgray")
+            self.maxvoltageDisplay.setFont(displayfont)
             self.maxcurrentDisplay.setReadOnly(True)
             self.maxcurrentDisplay.setStyleSheet("background-color: lightgray")
+            self.maxcurrentDisplay.setFont(displayfont)
 
             ps1Voltage = float(self.setvoltageDisplay.text())
             ps1VoltageMax = float(self.maxvoltageDisplay.text())
             ps1CurrentMax = float(self.maxcurrentDisplay.text())
 
             INI_write(ps1Voltage, ps1CurrentMax, ps1VoltageMax, False, 20, False) # need a way to handle the last three variables - will want the settings editable during a run
+
+    def on_advset_button_clicked(self):
+        self.AdvSettings = AdvSettings()
+        self.AdvSettings.show()
+
+        if self.AdvSettings.exec_():
+            print("OK")
+        else:
+            print("Cancel")
 
     def on_plotset_button_clicked(self):
         print("Click!")
@@ -261,8 +390,10 @@ class MainWindow(QMainWindow):
                         ps1.ovp = 'off'
                         ps1.ocp = 'on'
                         ps1.cv = 'on'
+                        ps1.output = 'on'
 
-                        dAqON == True
+                        dAqON = True
+                        runPS1 = True
 
                         PS_write(self)
                         PS_read(self)
@@ -273,15 +404,17 @@ class MainWindow(QMainWindow):
                 ps1.ovp = 'on'
                 ps1.ocp = 'off'
                 ps1.cv = 'off'
+                ps1.output = 'off'
 
-                dAqON == False
+                dAqON = False
+                runPS1 = False
                 pass
 
         except Exception:
             pass
 
     def timer_start(self):
-        self.time_left_int = int(dAqInterval * 0.1) # * 0.1 for DEMO, should be * 60 (seconds -> minutes)
+        self.time_left_int = int(dAqInterval * 0.1) # * 0.1 for DEMO, should be * 60 (minutes -> seconds)
         self.timer.start()
         self.update_timer_display()
 
@@ -290,14 +423,13 @@ class MainWindow(QMainWindow):
 
         if self.time_left_int == 0:
             self.get_telem() # function call to retrieve the telemetry from the power source
-            self.time_left_int = int(dAqInterval * 0.1) # * 0.1 for DEMO, should be * 60 (seconds -> minutes)
+            self.time_left_int = int(dAqInterval * 0.1) # * 0.1 for DEMO, should be * 60 (minutes -> seconds)
             date = datetime.datetime.now()
             testy1 = randint(0,50) # DEMO ONLY
             testy2 = randint(0,50) # DEMO ONLY
             self.update_plot(date, testy1, testy2) # remove for real app!!! Demo only
 
         self.update_timer_display()
-
 
     def update_timer_display(self):
         self.timerLabel.setText(time.strftime('%M:%S', time.gmtime(self.time_left_int)))
